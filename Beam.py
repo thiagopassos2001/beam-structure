@@ -1,22 +1,22 @@
 class beam():
 
-    def __init__(self,height,width,length):
+    def __init__(self,name,height,width,length):
 
-        # Mechanical Values
+        # Mechanical Information Values
+        self.name = name
         self.height = height
         self.width = width
         self.length = length
         self.weight = 0
+        self.id = 0
 
         # Numerical Settings
-        
         self.d = 0.001
         self.sub_div_plot = 4
         self.x_axis = [i*self.d for i in range(int(self.length/self.d))]
         self.n = len(self.x_axis)
 
         # Loads and reactions
-        self.id = 0
         self.load_list = []
         self.support_list = []
         self.shear_list = []
@@ -212,7 +212,7 @@ class beam():
 
     def plot_moment(self):
         self.update()
-        plt.figure(figsize=(18,3), dpi=100)
+        plt.figure(figsize=(18,5), dpi=100)
 
         # Bending Moment
         plt.plot([0]+self.x_axis, [0]+self.moment_list, c='red',label='bending moment')
@@ -240,7 +240,7 @@ class beam():
 
     def plot_shear(self):
         self.update()
-        plt.figure(figsize=(18,3), dpi=100)
+        plt.figure(figsize=(18,5), dpi=100)
 
         # Shear Force
         plt.plot([0]+self.x_axis, [0]+self.shear_list, c='red',label='shear force')
@@ -258,7 +258,7 @@ class beam():
         plt.show()
 
     def plot_load(self):
-        plt.figure(figsize=(18,3), dpi=100)
+        plt.figure(figsize=(18,5), dpi=100)
 
         load_total = [0 for i in self.x_axis]
         support_total = [0 for i in self.x_axis]
@@ -289,3 +289,36 @@ class beam():
         plt.grid(linestyle='--', linewidth=0.5)
         plt.xticks([i/self.sub_div_plot for i in range(int(self.sub_div_plot*self.length+1))])
         plt.show()
+
+    def info_beam(self):
+        self.update()
+        
+        print('Property\t\tValue\t\tUnity')
+
+        print('-'*50)
+        print('Informations')
+        print(f'Name:\t\t\t{self.name}')
+        print(f'Height:\t\t\t{self.height}\t\t(m)')
+        print(f'Width:\t\t\t{self.width}\t\t(m)')
+        print(f'Length:\t\t\t{self.length}\t\t(m)')
+        print(f'Weight:\t\t\t{self.weight}\t\t(kg)')
+        
+        print('-'*50)
+        print('Loads and Supports')
+        print(f'Number of Loads:\t{len(self.load_list)}\t\t-')
+        print(f'Number of Supports:\t{len(self.support_list)}\t\t-')
+        
+        print('-'*50)
+        print('Shear Force')
+        print(f'Maximum Value:\t\t{round(self.x_axis[self.shear_list.index(max(self.shear_list))],3)}, {round(max(self.shear_list),3)}\t(m, kN)')
+        print(f'Minumum Value:\t\t{round(self.x_axis[self.shear_list.index(min(self.shear_list))],3)}, {round(min(self.shear_list),3)}\t(m, kN)')
+        print(f'Null Value*:\t\t{round(self.x_axis[self.shear_list.index(null(self.shear_list))],3)}, {round(null(self.shear_list),3)}\t(m, kN)')
+
+        print('-'*50)
+        print('Bending Moment')
+        print(f'Maximum Value:\t\t{round(self.x_axis[self.moment_list.index(max(self.moment_list))],3)}, {round(max(self.moment_list),3)}\t(m, kNm)')
+        print(f'Minumum Value:\t\t{round(self.x_axis[self.moment_list.index(min(self.moment_list))],3)}, {round(min(self.moment_list),3)}\t(m, kNm)')
+        print(f'Null Value*:\t\t{round(self.x_axis[self.moment_list.index(null(self.moment_list))],3)}, {round(null(self.moment_list),3)}\t(m, kNm)')
+
+        print('-'*50)
+        print('*There may be more null values')
