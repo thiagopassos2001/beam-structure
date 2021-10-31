@@ -1,3 +1,12 @@
+import matplotlib.pyplot as plt
+
+def null(numeric_list):
+    z = max(numeric_list)
+    for i in numeric_list:
+        if abs(i - 0) <= z:
+            z = i
+    return z
+
 class beam():
 
     def __init__(self,name,height,width,length):
