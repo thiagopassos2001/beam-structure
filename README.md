@@ -1,15 +1,46 @@
 # Viga (Estrutura) (Beam (Structure))
 Classe para calcular numericamente cargas, esforços cortantes e momento fletor, gerando diagramas pelo matplotlib.
 
+Inspirado em softwares como o Ftool (https://www.ftool.com.br/) e Viga Online (https://www.aprenderengenharia.com.br/viga-online).
+
 * **REPOSITÓRIO INCOMPLETO**
 ## Exemplo de Código
 ~~~python
 
-v1 = beam('V1',0.5,0.25,3.0) # Create a beam
-v1.add_point_support(0,15,1) # Create a punctual support
-v1.add_point_support(3,15,2) # Create a punctual support
-v1.add_distributed_load([0,3],[-10,-10]) # Create a distributed load
-v1.sub_div_plot = 2 # Set a division x axis values
+# Create a beam
+v1 = beam('V1',0.5,0.25,6)
+
+# Loads and Moments
+
+# Create a pure bending moment
+# 32 kNm value at the moment
+# Apply in 4 m
+v1.add_pure_bending_moment(4,32)
+
+# Create a distributed load
+# Beginning with 15 kN/m and ending with 5kN/m
+# Start at 0 m and end at 4 m
+v1.add_distributed_load([0,6],[-15,-5])
+
+# Create a punctual force
+# 10 kN value at the force
+# Apply in 1 m
+v1.add_point_load(1, -10)
+# 15 kN value at the force
+# Apply in 2.5 m
+v1.add_point_load(2.5, -15)
+
+# Supports
+# 43.625 kN value at the force
+# Apply in 0 m
+# 2 support gender
+v1.add_point_support(0,43.625,2) # Create a punctual support
+
+# 41.375 kN value at the force
+# Apply in 4 m
+# 1 support gender
+v1.add_point_support(4,41.375,1) # Create a punctual support
+
 ~~~
 
 * Resumo das Informações da Viga
@@ -24,38 +55,46 @@ Informations
 Name:			V1
 Height:			0.5		(m)
 Width:			0.25		(m)
-Length:			3.0		(m)
+Length:			6		(m)
 Weight:			0		(kg)
 --------------------------------------------------
 Loads and Supports
-Number of Loads:	1		-
+Number of Loads:	3		-
 Number of Supports:	2		-
 --------------------------------------------------
 Shear Force
-Maximum Value:		0.0, 15.0	(m, kN)
-Minumum Value:		2.998, -14.98	(m, kN)
-Null Value*:		1.5, 0.0	(m, kN)
+Maximum Value*:		0.0, 43.625	(m, kN)
+Minumum Value*:		4.0, -28.04	(m, kN)
+Null Value*:		6.0, 0.001	(m, kN)
 --------------------------------------------------
 Bending Moment
-Maximum Value:		1.5, 11.265	(m, kNm)
-Minumum Value:		0.0, 0.015	(m, kNm)
-Null Value*:		0.0, 0.015	(m, kNm)
+Maximum Value*:		2.5, 51.531	(m, kNm)
+Minumum Value*:		4.0, -12.218	(m, kNm)
+Null Value*:		5.936, -0.004	(m, kNm)
 --------------------------------------------------
-*There may be more null values
+*There may be more values
 ~~~
 
 * Diagrama de Cargas (Load Diagram)
 ~~~python
 v1.plot_load()
 ~~~
-![image](https://user-images.githubusercontent.com/71474825/139559309-eb527146-4331-4006-8446-aca19c58de0a.png)
+
+Resultado do script:
+![image](https://user-images.githubusercontent.com/71474825/145699411-95df3f59-215d-434c-8dc7-2f97d0ae6c27.png)
+
 * Diagrama de Força Cortante (Shear Force Diagram)
 ~~~python
 v1.plot_shear()
 ~~~
-![image](https://user-images.githubusercontent.com/71474825/139559312-0045f0f8-bbdd-4d9f-9717-d0c234fe50f7.png)
+
+Resultado do script:
+![image](https://user-images.githubusercontent.com/71474825/145699535-eb4ef879-ebf8-4f39-9b05-dbf96ccd9a6b.png)
+
 * Diagrama de Momento Fletor (Bending Moment Diagram)
 ~~~python
 v1.plot_moment()
 ~~~
-![image](https://user-images.githubusercontent.com/71474825/139559314-2867f6a3-b120-44cd-8ec0-e66679a4cee3.png)
+
+Resultado do script:
+![image](https://user-images.githubusercontent.com/71474825/145699550-40ca8b6d-469d-487e-ba6c-ca39b4fe751c.png)
