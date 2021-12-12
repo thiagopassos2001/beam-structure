@@ -258,8 +258,8 @@ class beam():
                 moment_pos.append(0)
                 moment_neg.append(i)
             
-        plt.fill_between([0]+self.x_axis, moment_pos, color='blue')
-        plt.fill_between([0]+self.x_axis, moment_neg, color='red')
+        plt.fill_between([0]+self.x_axis, moment_pos, color='blue',label='positive bending moment')
+        plt.fill_between([0]+self.x_axis, moment_neg, color='red',label='negative bending moment')
         plt.plot([0]+self.x_axis, [0]+self.moment_list, color='black',label='bending moment')
         
         #y_max_moment = max(self.moment_list)
@@ -300,8 +300,8 @@ class beam():
                 shear_pos.append(0)
                 shear_neg.append(i)
             
-        plt.fill_between([0]+self.x_axis, shear_pos, color='blue')
-        plt.fill_between([0]+self.x_axis, shear_neg, color='red')
+        plt.fill_between([0]+self.x_axis, shear_pos, color='blue',label='positive shear force')
+        plt.fill_between([0]+self.x_axis, shear_neg, color='red',label='negative shear force')
         plt.plot([0]+self.x_axis, [0]+self.shear_list, color='black',label='shear force')
         
         # Beam
