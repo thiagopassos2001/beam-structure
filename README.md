@@ -1,7 +1,9 @@
 # Viga (Estrutura) (Beam (Structure))
-Classe para calcular numericamente cargas, esforços cortantes e momento fletor, gerando diagramas pelo matplotlib.
+Classe para calcular numericamente cargas, esforços cortantes e momento fletor por meio a da sobreposição do efeito das cargas e a discretização em pontos ao longo do comprimento da viga. Utiliza matplotlib para a geração dos diagramas. Inspirado em softwares como o Ftool (https://www.ftool.com.br/) e Viga Online (https://www.aprenderengenharia.com.br/viga-online).
 
-Inspirado em softwares como o Ftool (https://www.ftool.com.br/) e Viga Online (https://www.aprenderengenharia.com.br/viga-online).
+Ferramentas:
+* Esforços Cortantes em um ponto qualquer ao longo do comprimento discretizado
+* Momentos Fletores em um ponto qualquer ao longo do comprimento discretizado
 
 ## Exemplo de Código
 ~~~python
