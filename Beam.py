@@ -1,4 +1,7 @@
+# Last update in 12/12/2021
+
 import matplotlib.pyplot as plt
+plt.rcParams['figure.facecolor'] = 'white'
 
 def null(numeric_list):
     z = max(numeric_list)
@@ -20,7 +23,7 @@ class beam():
         self.id = 0
 
         # Numerical Settings
-        self.d = 0.001
+        self.d = 0.0001
         self.sub_div_plot = 4
         self.x_axis = [i*self.d for i in range(int(self.length/self.d))]
         self.n = len(self.x_axis)
@@ -28,6 +31,9 @@ class beam():
         # Loads and reactions
         self.load_list = []
         self.support_list = []
+        self.pure_bending_moment = []
+
+        # Sum values
         self.shear_list = []
         self.moment_list = []
 
@@ -174,6 +180,20 @@ class beam():
         load_info['moment_point'] = self.moment(dl,x0,x1)
         self.load_list.append(load_info)
     
+    def add_pure_bending_moment(self,x,moment_value):
+        self.id = self.id + 1
+        pbm = lambda:moment_value
+        x0 = x - self.d
+        x1 = x + self.d
+        moment_info = {
+            'id':self.id,
+            'left':x0,
+            'right':x1,
+            'moment_function':pbm
+                     }
+        moment_info['moment_point'] = [-pbm() if i >= x1 or i >= x0 else 0 for i in self.x_axis]
+        self.pure_bending_moment.append(moment_info)
+
     def check(self):
         pass
     
@@ -194,6 +214,9 @@ class beam():
             for j in range(self.n):
                 moment_total[j] = moment_total[j] + i['moment_point'][j]
         for i in self.load_list:
+            for j in range(self.n):
+                moment_total[j] = moment_total[j] + i['moment_point'][j]
+        for i in self.pure_bending_moment:
             for j in range(self.n):
                 moment_total[j] = moment_total[j] + i['moment_point'][j]
         self.moment_list = moment_total
@@ -224,18 +247,32 @@ class beam():
         plt.figure(figsize=(18,5), dpi=100)
 
         # Bending Moment
-        plt.plot([0]+self.x_axis, [0]+self.moment_list, c='red',label='bending moment')
-        y_max_moment = max(self.moment_list)
-        x_max_moment = self.x_axis[self.moment_list.index(y_max_moment)]
-        y_min_moment = min(self.moment_list)
-        x_min_moment = self.x_axis[self.moment_list.index(y_min_moment)]
-        plt.plot([x_max_moment,x_max_moment], [0,y_max_moment], c='lime',label=f'max moment = ({round(x_max_moment,3)} m, {round(y_max_moment,3)} kNm)')
-        plt.scatter([x_max_moment,x_max_moment], [0,y_max_moment], c='lime')
-        plt.plot([x_min_moment,x_min_moment], [0,y_min_moment], c='springgreen',label=f'min moment = ({round(x_min_moment,3)} m, {round(y_min_moment,3)} kNm)')
-        plt.scatter([x_min_moment,x_min_moment], [0,y_min_moment], c='springgreen')
+        moment_pos = []
+        moment_neg = []
+        
+        for i in [0]+self.moment_list:
+            if i >= 0:
+                moment_pos.append(i)
+                moment_neg.append(0)
+            else:
+                moment_pos.append(0)
+                moment_neg.append(i)
+            
+        plt.fill_between([0]+self.x_axis, moment_pos, color='blue')
+        plt.fill_between([0]+self.x_axis, moment_neg, color='red')
+        plt.plot([0]+self.x_axis, [0]+self.moment_list, color='black',label='bending moment')
+        
+        #y_max_moment = max(self.moment_list)
+        #x_max_moment = self.x_axis[self.moment_list.index(y_max_moment)]
+        #y_min_moment = min(self.moment_list)
+        #x_min_moment = self.x_axis[self.moment_list.index(y_min_moment)]
+        #plt.plot([x_max_moment,x_max_moment], [0,y_max_moment], c='lime',label=f'max moment = ({round(x_max_moment,3)} m, {round(y_max_moment,3)} kNm)')
+        #plt.scatter([x_max_moment,x_max_moment], [0,y_max_moment], c='lime')
+        #plt.plot([x_min_moment,x_min_moment], [0,y_min_moment], c='springgreen',label=f'min moment = ({round(x_min_moment,3)} m, {round(y_min_moment,3)} kNm)')
+        #plt.scatter([x_min_moment,x_min_moment], [0,y_min_moment], c='springgreen')
         
         # Beam
-        plt.plot([0,self.length,self.length,0,0], [0,0,-self.height,-self.height,0],c='black')
+        plt.plot([0,self.length,self.length,0,0], [self.height/2,self.height/2,-self.height/2,-self.height/2,self.height/2],c='black')
         
         # Settings
         plt.xlabel('Length Beam (m)')
@@ -252,10 +289,23 @@ class beam():
         plt.figure(figsize=(18,5), dpi=100)
 
         # Shear Force
-        plt.plot([0]+self.x_axis, [0]+self.shear_list, c='red',label='shear force')
+        shear_pos = []
+        shear_neg = []
+        
+        for i in [0]+self.shear_list:
+            if i >= 0:
+                shear_pos.append(i)
+                shear_neg.append(0)
+            else:
+                shear_pos.append(0)
+                shear_neg.append(i)
+            
+        plt.fill_between([0]+self.x_axis, shear_pos, color='blue')
+        plt.fill_between([0]+self.x_axis, shear_neg, color='red')
+        plt.plot([0]+self.x_axis, [0]+self.shear_list, color='black',label='shear force')
         
         # Beam
-        plt.plot([0,self.length,self.length,0,0], [0,0,-self.height,-self.height,0],c='black')
+        plt.plot([0,self.length,self.length,0,0], [self.height/2,self.height/2,-self.height/2,-self.height/2,self.height/2],c='black')
         
         # Settings
         plt.xlabel('Length Beam (m)')
@@ -271,12 +321,12 @@ class beam():
 
         load_total = [0 for i in self.x_axis]
         support_total = [0 for i in self.x_axis]
+        pure_moment_total = []
         
         # Supports
         for i in self.support_list:
             for j in range(self.n):
                 support_total[j] = support_total[j] + ((-1)*(i['support_point'][j]))
-        
         
         plt.plot([0]+self.x_axis+[self.length], [0]+support_total+[0], c='blue',label='support')
         
@@ -287,8 +337,20 @@ class beam():
         
         plt.plot([0]+self.x_axis+[self.length], [0]+load_total+[0], c='red',label='load')
         
+        # Pure Bending Moment
+        for i in self.pure_bending_moment:
+            x_p = [i['left']]
+            y_p = [0]
+            plt.scatter(x_p,y_p,
+                        s=1000,
+                        facecolors='none',
+                        edgecolors='r',
+                        label=f'pure bending {i["moment_function"]()} kNm')
+            for xp,yp in zip(x_p, y_p): 
+                plt.text(xp + 0.05, yp + 5, f'{i["moment_function"]()} kNm')
+        
         # Beam
-        plt.plot([0,self.length,self.length,0,0], [0,0,-self.height,-self.height,0],c='black')
+        plt.plot([0,self.length,self.length,0,0], [self.height/2,self.height/2,-self.height/2,-self.height/2,self.height/2],c='black')
         
         # Settings
         plt.xlabel('Length Beam (m)')
@@ -319,15 +381,15 @@ class beam():
         
         print('-'*50)
         print('Shear Force')
-        print(f'Maximum Value:\t\t{round(self.x_axis[self.shear_list.index(max(self.shear_list))],3)}, {round(max(self.shear_list),3)}\t(m, kN)')
-        print(f'Minumum Value:\t\t{round(self.x_axis[self.shear_list.index(min(self.shear_list))],3)}, {round(min(self.shear_list),3)}\t(m, kN)')
+        print(f'Maximum Value*:\t\t{round(self.x_axis[self.shear_list.index(max(self.shear_list))],3)}, {round(max(self.shear_list),3)}\t(m, kN)')
+        print(f'Minumum Value*:\t\t{round(self.x_axis[self.shear_list.index(min(self.shear_list))],3)}, {round(min(self.shear_list),3)}\t(m, kN)')
         print(f'Null Value*:\t\t{round(self.x_axis[self.shear_list.index(null(self.shear_list))],3)}, {round(null(self.shear_list),3)}\t(m, kN)')
 
         print('-'*50)
         print('Bending Moment')
-        print(f'Maximum Value:\t\t{round(self.x_axis[self.moment_list.index(max(self.moment_list))],3)}, {round(max(self.moment_list),3)}\t(m, kNm)')
-        print(f'Minumum Value:\t\t{round(self.x_axis[self.moment_list.index(min(self.moment_list))],3)}, {round(min(self.moment_list),3)}\t(m, kNm)')
+        print(f'Maximum Value*:\t\t{round(self.x_axis[self.moment_list.index(max(self.moment_list))],3)}, {round(max(self.moment_list),3)}\t(m, kNm)')
+        print(f'Minumum Value*:\t\t{round(self.x_axis[self.moment_list.index(min(self.moment_list))],3)}, {round(min(self.moment_list),3)}\t(m, kNm)')
         print(f'Null Value*:\t\t{round(self.x_axis[self.moment_list.index(null(self.moment_list))],3)}, {round(null(self.moment_list),3)}\t(m, kNm)')
 
         print('-'*50)
-        print('*There may be more null values')
+        print('*There may be more values')
