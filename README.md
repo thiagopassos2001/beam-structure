@@ -31,6 +31,7 @@ v1.add_point_load(1, -10)
 v1.add_point_load(2.5, -15)
 
 # Supports
+
 # 43.625 kN value at the force
 # Apply in 0 m
 # 2 support gender
