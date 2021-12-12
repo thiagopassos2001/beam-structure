@@ -3,7 +3,6 @@ Classe para calcular numericamente cargas, esforços cortantes e momento fletor,
 
 Inspirado em softwares como o Ftool (https://www.ftool.com.br/) e Viga Online (https://www.aprenderengenharia.com.br/viga-online).
 
-* **REPOSITÓRIO INCOMPLETO**
 ## Exemplo de Código
 ~~~python
 
