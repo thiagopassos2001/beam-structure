@@ -7,9 +7,10 @@ Ferramentas:
 
 ## Exemplo de Código
 ~~~python
+Import  Beam
 
 # Create a beam
-v1 = beam('V1',0.5,0.25,6)
+v1 = Beam.beam('V1',0.5,0.25,6)
 
 # Loads and Moments
 
