@@ -1,6 +1,7 @@
 # Last update in 12/12/2021
 
 import matplotlib.pyplot as plt
+import math
 plt.rcParams['figure.facecolor'] = 'white'
 
 def null(numeric_list):
@@ -24,9 +25,12 @@ class beam():
 
         # Numerical Settings
         self.d = 0.0001
+        self.round = 3
+        self.offset_value = 0.05
         self.sub_div_plot = 4
         self.x_axis = [i*self.d for i in range(int(self.length/self.d))]
         self.n = len(self.x_axis)
+        self.section = [0,self.length]
 
         # Loads and reactions
         self.load_list = []
@@ -40,6 +44,18 @@ class beam():
         # References
         self.reference = 'https://en.wikipedia.org/wiki/Beam_(structure)'
     
+    def offset_function(self, value):
+        f1 = lambda x:(math.log10((x**1)+1))*(150-x)*(5-x)
+        f2 = lambda x:(math.log10((x**2)+1))*(150-x)*(5-x)
+        f3 = lambda x:(x**2 - 25)*(150-x)*(5-x)
+        
+        if abs(value) > 5 and abs(value) < 150 and value >= 0:       
+            return value*((-0.0017241379310344827*value) + 0.3086206896551724 + (0.0015656608185793338*f1(value)) + (-0.0007778063432191976*f2(value)) + (-1.2922303632577066e-09*f3(value)))
+        elif abs(value) > 150:
+            return value*0.05
+        else:
+            return 5
+        
     def LagrangePolynomial(self,x_list,y_list):
 
         if len(x_list) != len(y_list):
@@ -179,7 +195,7 @@ class beam():
         load_info['shear_point'] = self.shear(dl,x0,x1)
         load_info['moment_point'] = self.moment(dl,x0,x1)
         self.load_list.append(load_info)
-    
+
     def add_pure_bending_moment(self,x,moment_value):
         self.id = self.id + 1
         pbm = lambda:moment_value
@@ -198,6 +214,26 @@ class beam():
         pass
     
     def update(self):
+        
+        # Section Points
+        self.section = [0,self.length]
+        for i in self.support_list:
+            pos = i['left']
+            if not pos in self.section:
+                self.section.append(pos)
+        
+        for i in self.load_list:
+            pos = i['left']
+            if not pos in self.section:
+                self.section.append(pos)
+        
+        for i in self.pure_bending_moment:
+            pos = i['left']
+            if not pos in self.section:
+                self.section.append(pos)
+        
+        self.section = sorted(self.section)
+        
         # Shear
         shear_total = [0 for i in self.x_axis]
         for i in self.support_list:
@@ -245,9 +281,37 @@ class beam():
     def plot_moment(self):
         self.update()
         plt.figure(figsize=(18,5), dpi=100)
+        global_max_moment = max(self.moment_list)
+        of = self.offset_function(global_max_moment)
 
         # Bending Moment
-        moment_pos = []
+        ns = len(self.section) 
+        
+        for right_sec in range(ns-1):
+            point_moment = []
+            section_moment = []
+            
+            for pos in range(self.n):
+                if self.x_axis[pos] > self.section[right_sec] and self.x_axis[pos] < self.section[right_sec+1]:
+                    section_moment.append(self.moment_list[pos])
+                    point_moment.append(self.x_axis[pos])
+            
+            plt.fill_between(point_moment, section_moment)
+            
+            if len(section_moment) > 0:
+                
+                max_moment_section = max(section_moment)
+                min_moment_section = min(section_moment)
+                x_max = point_moment[section_moment.index(max_moment_section)]
+                x_min = point_moment[section_moment.index(min_moment_section)]
+                
+                plt.scatter(x_max, max_moment_section,c='red')
+                plt.scatter(x_min, min_moment_section,c='red')
+                
+                plt.text(x_max, max_moment_section + of, f'{round(max_moment_section, self.round)}')
+                plt.text(x_min, min_moment_section + of, f'{round(min_moment_section, self.round)}')
+
+        '''moment_pos = []
         moment_neg = []
         
         for i in [0]+self.moment_list:
@@ -257,9 +321,10 @@ class beam():
             else:
                 moment_pos.append(0)
                 moment_neg.append(i)
-            
+
         plt.fill_between([0]+self.x_axis, moment_pos, color='blue',label='positive bending moment')
-        plt.fill_between([0]+self.x_axis, moment_neg, color='red',label='negative bending moment')
+        plt.fill_between([0]+self.x_axis, moment_neg, color='red',label='negative bending moment')'''
+        
         plt.plot([0]+self.x_axis, [0]+self.moment_list, color='black',label='bending moment')
         
         #y_max_moment = max(self.moment_list)
@@ -287,21 +352,36 @@ class beam():
     def plot_shear(self):
         self.update()
         plt.figure(figsize=(18,5), dpi=100)
+        global_max_shear = max(self.shear_list)
+        of = self.offset_function(global_max_shear )
 
         # Shear Force
-        shear_pos = []
-        shear_neg = []
+        ns = len(self.section) 
         
-        for i in [0]+self.shear_list:
-            if i >= 0:
-                shear_pos.append(i)
-                shear_neg.append(0)
-            else:
-                shear_pos.append(0)
-                shear_neg.append(i)
+        for right_sec in range(ns-1):
+            point_shear = []
+            section_shear = []
             
-        plt.fill_between([0]+self.x_axis, shear_pos, color='blue',label='positive shear force')
-        plt.fill_between([0]+self.x_axis, shear_neg, color='red',label='negative shear force')
+            for pos in range(self.n):
+                if self.x_axis[pos] > self.section[right_sec] and self.x_axis[pos] < self.section[right_sec+1]:
+                    section_shear.append(self.shear_list[pos])
+                    point_shear.append(self.x_axis[pos])
+            
+            plt.fill_between(point_shear, section_shear)
+            
+            if len(section_shear) > 0:
+                
+                max_shear_section = max(section_shear)
+                min_shear_section = min(section_shear)
+                x_max = point_shear[section_shear.index(max_shear_section)]
+                x_min = point_shear[section_shear.index(min_shear_section)]
+                
+                plt.scatter(x_max, max_shear_section,c='red')
+                plt.scatter(x_min, min_shear_section,c='red')
+                
+                plt.text(x_max, max_shear_section + of, f'{round(max_shear_section, self.round)}')
+                plt.text(x_min, min_shear_section + of, f'{round(min_shear_section, self.round)}')
+        
         plt.plot([0]+self.x_axis, [0]+self.shear_list, color='black',label='shear force')
         
         # Beam
@@ -315,7 +395,8 @@ class beam():
         plt.grid(linestyle='--', linewidth=0.5)
         plt.xticks([i/self.sub_div_plot for i in range(int(self.sub_div_plot*self.length+1))])
         plt.show()
-
+    
+    # Old
     def plot_load(self):
         plt.figure(figsize=(18,5), dpi=100)
 
