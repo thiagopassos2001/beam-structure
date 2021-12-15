@@ -91,7 +91,7 @@ v1.plot_shear()
 ~~~
 
 Resultado do script:
-![image](https://user-images.githubusercontent.com/71474825/145699535-eb4ef879-ebf8-4f39-9b05-dbf96ccd9a6b.png)
+![image](https://user-images.githubusercontent.com/71474825/146239589-b2713701-010e-46af-9dba-d9c9e4569088.png)
 
 * Diagrama de Momento Fletor (Bending Moment Diagram)
 ~~~python
@@ -99,4 +99,4 @@ v1.plot_moment()
 ~~~
 
 Resultado do script:
-![image](https://user-images.githubusercontent.com/71474825/145699550-40ca8b6d-469d-487e-ba6c-ca39b4fe751c.png)
+![image](https://user-images.githubusercontent.com/71474825/146239619-289d99c8-7aa6-4ce2-9ad7-cc059f620fa6.png)
